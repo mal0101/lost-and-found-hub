@@ -3,20 +3,20 @@
 $page_title = "Claim Item";
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /pages/auth/login.php");
     exit;
 }
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 // Check if item ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: index.php");
+    header("Location: /index.php");
     exit;
 }
 
@@ -32,7 +32,7 @@ $item = $stmt->fetch();
 
 // If item doesn't exist, redirect to home
 if (!$item) {
-    header("Location: index.php");
+    header("Location: /index.php");
     exit;
 }
 
@@ -138,5 +138,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>

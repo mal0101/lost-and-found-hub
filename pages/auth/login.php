@@ -7,12 +7,12 @@ session_start();
 
 // If user is already logged in, redirect to index
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: /index.php");
     exit;
 }
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 $error = "";
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             
             // Redirect to index page
-            header("Location: index.php");
+            header("Location: /index.php");
             exit;
         } else {
             $error = "Invalid email or password";
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 ?>
 
 <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-8">
@@ -91,5 +91,5 @@ require_once 'includes/header.php';
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>

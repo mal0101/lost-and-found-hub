@@ -3,10 +3,10 @@
 $page_title = "Home";
 
 // Include header
-require_once 'includes/header.php';
+require_once 'includes/templates/header.php';
 
 // Include database connection
-require_once 'includes/db.php';
+require_once 'config/db.php';
 
 // Fetch items from the database
 $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
@@ -107,5 +107,5 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once 'includes/templates/footer.php';
 ?>

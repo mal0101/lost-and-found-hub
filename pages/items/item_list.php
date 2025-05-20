@@ -3,10 +3,10 @@
 $page_title = "All Items";
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 // Pagination settings
 $items_per_page = 12;
@@ -161,5 +161,5 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>

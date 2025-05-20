@@ -3,16 +3,16 @@
 $page_title = "Report Found Item";
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /pages/auth/login.php");
     exit;
 }
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 $success = $error = "";
 
@@ -153,5 +153,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>

@@ -1,18 +1,19 @@
 <?php
 // Set page title
-$page_title = "Add Item";
+$page_title = "Report Lost Item";
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /pages/auth/login.php");
     exit;
 }
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
+
 $success = $error = "";
 
 // Process form submission
@@ -20,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
-    $status = $_POST['status'];
     $location = trim($_POST['location']);
+    $status = 'lost'; // Always lost for this form
     
     // Validate input
     if (empty($title) || empty($description) || empty($location)) {
@@ -70,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':image_path' => $image_path
                 ]);
                 
-                $success = "Item posted successfully!";
+                $success = "Lost item reported successfully!";
                 // Clear form data
                 $title = $description = $location = "";
                 
@@ -83,14 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    <h2 class="text-2xl font-bold mb-6">Post a New Item</h2>
+    <h2 class="text-2xl font-bold mb-6">Report a Lost Item</h2>
     
     <?php if ($success): ?>
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
             <p><?php echo $success; ?></p>
             <p class="mt-2">
                 <a href="index.php" class="text-green-700 font-bold underline">View all items</a> or 
-                <a href="dashboard.php" class="text-green-700 font-bold underline">view your items</a>
+                <a href="dashboard.php" class="text-green-700 font-bold underline">go to your dashboard</a>
             </p>
         </div>
     <?php endif; ?>
@@ -101,24 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
     
-    <form action="add_item.php" method="post" enctype="multipart/form-data">
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
-                Status
-            </label>
-            <select name="status" id="status" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                <option value="lost" <?php echo isset($status) && $status === 'lost' ? 'selected' : ''; ?>>Lost Item</option>
-                <option value="found" <?php echo isset($status) && $status === 'found' ? 'selected' : ''; ?>>Found Item</option>
-            </select>
-            <p class="text-sm text-gray-600 mt-1">Or use dedicated pages: 
-                <a href="report_lost_item.php" class="text-blue-500 hover:underline">Report Lost Item</a> / 
-                <a href="report_found_item.php" class="text-blue-500 hover:underline">Report Found Item</a>
-            </p>
-        </div>
-        
+    <form action="report_lost_item.php" method="post" enctype="multipart/form-data">
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
-                Title *
+                Item Title *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                    id="title" type="text" name="title" value="<?php echo isset($title) ? htmlspecialchars($title) : ''; ?>" required>
@@ -136,11 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="location">
-                Location *
+                Where did you lose it? *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                    id="location" type="text" name="location" value="<?php echo isset($location) ? htmlspecialchars($location) : ''; ?>" required>
-            <p class="text-sm text-gray-600 mt-1">Where the item was lost or found (e.g., "Central Park" or "Main Library, 2nd floor")</p>
+            <p class="text-sm text-gray-600 mt-1">Be as specific as possible (e.g., "Central Park near the fountain" or "Main Library, 2nd floor")</p>
         </div>
         
         <div class="mb-6">
@@ -153,12 +140,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="flex items-center justify-between">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
                     type="submit">
-                Post Item
+                Report Lost Item
             </button>
-            <a href="index.php" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                Cancel
+            <a href="dashboard.php" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                Back to Dashboard
             </a>
         </div>
     </form>
@@ -166,5 +153,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>

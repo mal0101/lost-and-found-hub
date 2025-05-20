@@ -3,7 +3,7 @@
 $page_title = "Contact Us";
 
 // Include header
-require_once 'includes/header.php';
+require_once 'includes/templates/header.php';;
 
 $success = $error = "";
 
@@ -109,5 +109,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once 'includes/templates/footer.php';
 ?>

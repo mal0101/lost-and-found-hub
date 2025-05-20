@@ -3,14 +3,14 @@
 $page_title = "Item Details";
 
 // Include header
-require_once 'includes/header.php';
+require_once __DIR__ . '/../../includes/templates/header.php';
 
 // Include database connection
-require_once 'includes/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 // Check if item ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: index.php");
+    header("Location: /index.php");
     exit;
 }
 
@@ -26,7 +26,7 @@ $item = $stmt->fetch();
 
 // If item doesn't exist, redirect to home
 if (!$item) {
-    header("Location: index.php");
+    header("Location: /index.php");
     exit;
 }
 
@@ -108,5 +108,5 @@ $is_owner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $item['user_i
 
 <?php
 // Include footer
-require_once 'includes/footer.php';
+require_once __DIR__ . '/../../includes/templates/footer.php';
 ?>
