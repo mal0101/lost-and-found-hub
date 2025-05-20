@@ -1,12 +1,16 @@
 <?php
-// Set page title
-$page_title = "All Items";
-
-// Include header
-require_once __DIR__ . '/../../includes/templates/header.php';
-
-// Include database connection
-require_once __DIR__ . '/../../config/db.php';
+// If this file is included from index.php, ROOT_PATH is already defined
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', dirname(dirname(__DIR__)));
+    
+    // Set page title
+    $page_title = "All Items";
+    
+    // Include essential files
+    require_once ROOT_PATH . '/config/db.php';
+    require_once ROOT_PATH . '/includes/helpers/functions.php';
+    require_once ROOT_PATH . '/includes/templates/header.php';
+}
 
 // Pagination settings
 $items_per_page = 12;
@@ -57,11 +61,11 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <h1 class="text-2xl font-bold mb-4">All Items</h1>
     
     <div class="mt-6">
-        <form action="items_list.php" method="get" class="flex flex-wrap gap-4">
+        <form action="<?php echo url('pages/items/item_list.php'); ?>" method="get" class="flex flex-wrap gap-4">
             <div class="flex-1">
                 <input type="text" name="search" placeholder="Search for items..." 
                        class="w-full px-4 py-2 border rounded"
-                       value="<?php echo htmlspecialchars($search); ?>">
+                       value="<?php echo h($search); ?>">
             </div>
             <div>
                 <select name="status" class="px-4 py-2 border rounded">
@@ -77,7 +81,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <?php if ($search || $status_filter): ?>
                 <div>
-                    <a href="items_list.php" class="text-blue-500 hover:underline">Clear Filters</a>
+                    <a href="<?php echo url('pages/items/item_list.php'); ?>" class="text-blue-500 hover:underline">Clear Filters</a>
                 </div>
             <?php endif; ?>
         </form>
@@ -87,27 +91,27 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php if (count($items) > 0): ?>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach ($items as $item): ?>
-            <div class="bg-white rounded shadow overflow-hidden">
-                <?php if (!empty($item['image_path']) && file_exists($item['image_path'])): ?>
+            <div class="bg-white rounded shadow overflow-hidden item-card">
+                <?php if (!empty($item['image_path']) && file_exists(ROOT_PATH . '/' . $item['image_path'])): ?>
                     <div class="h-48 overflow-hidden">
-                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="w-full h-full object-cover">
+                        <img src="<?php echo url($item['image_path']); ?>" alt="<?php echo h($item['title']); ?>" class="w-full h-full object-cover">
                     </div>
                 <?php endif; ?>
                 <div class="p-4">
                     <span class="inline-block px-2 py-1 rounded <?php echo $item['status'] === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> text-sm font-semibold mb-2">
                         <?php echo ucfirst($item['status']); ?>
                     </span>
-                    <h3 class="text-xl font-bold mb-2"><?php echo htmlspecialchars($item['title']); ?></h3>
-                    <p class="text-gray-700"><?php echo htmlspecialchars(substr($item['description'], 0, 100)) . (strlen($item['description']) > 100 ? '...' : ''); ?></p>
+                    <h3 class="text-xl font-bold mb-2"><?php echo h($item['title']); ?></h3>
+                    <p class="text-gray-700"><?php echo h(substr($item['description'], 0, 100)) . (strlen($item['description']) > 100 ? '...' : ''); ?></p>
                     
                     <div class="mt-4 text-sm text-gray-600">
-                        <p>Location: <?php echo htmlspecialchars($item['location']); ?></p>
-                        <p>Posted by: <?php echo htmlspecialchars($item['username']); ?></p>
+                        <p>Location: <?php echo h($item['location']); ?></p>
+                        <p>Posted by: <?php echo h($item['username']); ?></p>
                         <p>Date: <?php echo date('M j, Y', strtotime($item['date_posted'])); ?></p>
                     </div>
                     
                     <div class="mt-4">
-                        <a href="item_details.php?id=<?php echo $item['id']; ?>" class="text-blue-500 hover:underline">View Details</a>
+                        <a href="<?php echo url('pages/items/item_details.php?id=' . $item['id']); ?>" class="text-blue-500 hover:underline">View Details</a>
                     </div>
                 </div>
             </div>
@@ -119,7 +123,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="mt-8 flex justify-center">
             <div class="flex space-x-1">
                 <?php if ($page > 1): ?>
-                    <a href="?page=<?php echo $page - 1; ?><?php echo $status_filter ? '&status='.$status_filter : ''; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" 
+                    <a href="?page=<?php echo $page - 1; ?><?php echo $status_filter ? '&status='.h($status_filter) : ''; ?><?php echo $search ? '&search='.urlencode(h($search)) : ''; ?>" 
                        class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
                         Previous
                     </a>
@@ -131,7 +135,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php echo $i; ?>
                         </span>
                     <?php else: ?>
-                        <a href="?page=<?php echo $i; ?><?php echo $status_filter ? '&status='.$status_filter : ''; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" 
+                        <a href="?page=<?php echo $i; ?><?php echo $status_filter ? '&status='.h($status_filter) : ''; ?><?php echo $search ? '&search='.urlencode(h($search)) : ''; ?>" 
                            class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
                             <?php echo $i; ?>
                         </a>
@@ -139,7 +143,7 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endfor; ?>
                 
                 <?php if ($page < $total_pages): ?>
-                    <a href="?page=<?php echo $page + 1; ?><?php echo $status_filter ? '&status='.$status_filter : ''; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" 
+                    <a href="?page=<?php echo $page + 1; ?><?php echo $status_filter ? '&status='.h($status_filter) : ''; ?><?php echo $search ? '&search='.urlencode(h($search)) : ''; ?>" 
                        class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
                         Next
                     </a>
@@ -153,13 +157,15 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p class="text-lg text-gray-700">No items found matching your criteria.</p>
         <?php if ($search || $status_filter): ?>
             <p class="mt-2">
-                <a href="items_list.php" class="text-blue-500 hover:underline">Clear filters</a> to see all items.
+                <a href="<?php echo url('pages/items/item_list.php'); ?>" class="text-blue-500 hover:underline">Clear filters</a> to see all items.
             </p>
         <?php endif; ?>
     </div>
 <?php endif; ?>
 
 <?php
-// Include footer
-require_once __DIR__ . '/../../includes/templates/footer.php';
+// Only include footer if this file is not included from index.php
+if (!defined('INCLUDED_FROM_INDEX')) {
+    require_once ROOT_PATH . '/includes/templates/footer.php';
+}
 ?>

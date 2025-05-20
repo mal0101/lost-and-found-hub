@@ -4,15 +4,19 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include helper functions if they exist
-if (file_exists(__DIR__ . '/../helpers/functions.php')) {
-    require_once __DIR__ . '/../helpers/functions.php';
+// If ROOT_PATH is not defined (direct access to this file)
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', dirname(dirname(__DIR__)));
+    require_once ROOT_PATH . '/includes/helpers/functions.php';
 }
 
-// Helper function if not using the functions.php file
-if (!function_exists('url')) {
-    function url($path) {
-        return '/' . ltrim($path, '/');
+// Check for flash messages
+$flash = get_flash_message();
+if ($flash) {
+    if ($flash['type'] === 'success') {
+        $success_message = $flash['message'];
+    } else {
+        $error_message = $flash['message'];
     }
 }
 ?>
@@ -31,11 +35,11 @@ if (!function_exists('url')) {
     <link href="<?php echo url('assets/css/style.css'); ?>" rel="stylesheet">
     
     <!-- Favicon -->
-    <link rel="shortcut icon" href="<?php echo url('assets/favicon.ico'); ?>" type="image/x-icon">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Include the navigation bar -->
-    <?php require_once __DIR__ . '/navbar.php'; ?>
+    <?php require_once ROOT_PATH . '/includes/templates/navbar.php'; ?>
     
     <!-- Main content container -->
     <div class="container mx-auto p-4 flex-grow">

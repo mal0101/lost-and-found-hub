@@ -1,18 +1,22 @@
 <?php
+// Define root path
+define('ROOT_PATH', dirname(dirname(__DIR__)));
+
 // Set page title
 $page_title = "Report Lost Item";
 
-// Include header
-require_once __DIR__ . '/../../includes/templates/header.php';
+// Include essential files
+require_once ROOT_PATH . '/config/db.php';
+require_once ROOT_PATH . '/includes/helpers/functions.php';
+
+// Start session
+session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /pages/auth/login.php");
-    exit;
+    set_flash_message('error', 'You must be logged in to report a lost item');
+    redirect('pages/auth/login.php');
 }
-
-// Include database connection
-require_once __DIR__ . '/../../config/db.php';
 
 $success = $error = "";
 
@@ -32,8 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image_path = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
             // Create uploads directory if it doesn't exist
-            if (!file_exists('uploads')) {
-                mkdir('uploads', 0777, true);
+            $upload_dir = ROOT_PATH . '/public/uploads';
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
             }
             
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
@@ -45,9 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Image size must be less than 2MB";
             } else {
                 $file_name = time() . '_' . $_FILES['image']['name']; 
-                $destination = 'uploads/' . $file_name;
+                $destination = 'public/uploads/' . $file_name;
                 
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $destination)) {
+                if (move_uploaded_file($_FILES['image']['tmp_name'], ROOT_PATH . '/' . $destination)) {
                     $image_path = $destination;
                 } else {
                     $error = "Failed to upload image";
@@ -81,6 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Include header
+require_once ROOT_PATH . '/includes/templates/header.php';
 ?>
 
 <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -90,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
             <p><?php echo $success; ?></p>
             <p class="mt-2">
-                <a href="index.php" class="text-green-700 font-bold underline">View all items</a> or 
-                <a href="dashboard.php" class="text-green-700 font-bold underline">go to your dashboard</a>
+                <a href="<?php echo url('index.php'); ?>" class="text-green-700 font-bold underline">View all items</a> or 
+                <a href="<?php echo url('pages/user/dashboard.php'); ?>" class="text-green-700 font-bold underline">go to your dashboard</a>
             </p>
         </div>
     <?php endif; ?>
@@ -102,13 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
     
-    <form action="report_lost_item.php" method="post" enctype="multipart/form-data">
+    <form action="<?php echo url('pages/items/report_lost_item.php'); ?>" method="post" enctype="multipart/form-data">
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
                 Item Title *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                   id="title" type="text" name="title" value="<?php echo isset($title) ? htmlspecialchars($title) : ''; ?>" required>
+                   id="title" type="text" name="title" value="<?php echo isset($title) ? h($title) : ''; ?>" required>
             <p class="text-sm text-gray-600 mt-1">Example: "Gold watch with brown strap" or "Black wallet with ID"</p>
         </div>
         
@@ -117,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Description *
             </label>
             <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                      id="description" name="description" rows="4" required><?php echo isset($description) ? htmlspecialchars($description) : ''; ?></textarea>
+                      id="description" name="description" rows="4" required><?php echo isset($description) ? h($description) : ''; ?></textarea>
             <p class="text-sm text-gray-600 mt-1">Include details like brand, color, and any identifying features</p>
         </div>
         
@@ -126,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Where did you lose it? *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                   id="location" type="text" name="location" value="<?php echo isset($location) ? htmlspecialchars($location) : ''; ?>" required>
+                   id="location" type="text" name="location" value="<?php echo isset($location) ? h($location) : ''; ?>" required>
             <p class="text-sm text-gray-600 mt-1">Be as specific as possible (e.g., "Central Park near the fountain" or "Main Library, 2nd floor")</p>
         </div>
         
@@ -137,6 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                    id="image" type="file" name="image" accept="image/*">
             <p class="text-sm text-gray-600 mt-1">Upload a clear photo of the item (Max size: 2MB)</p>
+            <div id="image-preview" class="mt-2 hidden">
+                <img src="" alt="Preview" class="max-w-xs rounded">
+            </div>
         </div>
         
         <div class="flex items-center justify-between">
@@ -144,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     type="submit">
                 Report Lost Item
             </button>
-            <a href="dashboard.php" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+            <a href="<?php echo url('pages/user/dashboard.php'); ?>" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
                 Back to Dashboard
             </a>
         </div>
@@ -153,5 +164,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once __DIR__ . '/../../includes/templates/footer.php';
+require_once ROOT_PATH . '/includes/templates/footer.php';
 ?>

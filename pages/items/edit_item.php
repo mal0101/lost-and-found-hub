@@ -1,21 +1,27 @@
 <?php
+// Define root path
+define('ROOT_PATH', dirname(dirname(__DIR__)));
+
 // Set page title
 $page_title = "Edit Item";
 
-// Include header
-require_once __DIR__ . '/../../includes/templates/header.php';
+// Include essential files
+require_once ROOT_PATH . '/config/db.php';
+require_once ROOT_PATH . '/includes/helpers/functions.php';
+
+// Start session
+session_start();
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /pages/auth/login.php");
-    exit;
+    set_flash_message('error', 'You must be logged in to edit an item');
+    redirect('pages/auth/login.php');
 }
-
-// Include database connection
-require_once __DIR__ . '/../../config/db.php';
 
 // Check if item ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: /pages/user/dashboard.php");    exit;
+    set_flash_message('error', 'No item specified');
+    redirect('pages/user/dashboard.php');
 }
 
 // Fetch item details and check ownership
@@ -25,7 +31,8 @@ $item = $stmt->fetch();
 
 // If item doesn't exist or doesn't belong to current user, redirect
 if (!$item) {
-    header("Location: /pages/user/dashboard.php");    exit;
+    set_flash_message('error', 'You do not have permission to edit this item');
+    redirect('pages/user/dashboard.php');
 }
 
 $success = $error = "";
@@ -47,8 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
             // Create uploads directory if it doesn't exist
-            if (!file_exists('uploads')) {
-                mkdir('uploads', 0777, true);
+            $upload_dir = ROOT_PATH . '/public/uploads';
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
             }
             
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
@@ -60,12 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Image size must be less than 2MB";
             } else {
                 $file_name = time() . '_' . $_FILES['image']['name']; 
-                $destination = 'uploads/' . $file_name;
+                $destination = 'public/uploads/' . $file_name;
                 
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $destination)) {
+                if (move_uploaded_file($_FILES['image']['tmp_name'], ROOT_PATH . '/' . $destination)) {
                     // Delete old image if exists and not the default
-                    if (!empty($item['image_path']) && file_exists($item['image_path'])) {
-                        unlink($item['image_path']);
+                    if (!empty($item['image_path']) && file_exists(ROOT_PATH . '/' . $item['image_path'])) {
+                        unlink(ROOT_PATH . '/' . $item['image_path']);
                     }
                     $image_path = $destination;
                 } else {
@@ -76,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Handle image deletion if requested
         if (isset($_POST['delete_image']) && $_POST['delete_image'] == 1) {
-            if (!empty($item['image_path']) && file_exists($item['image_path'])) {
-                unlink($item['image_path']);
+            if (!empty($item['image_path']) && file_exists(ROOT_PATH . '/' . $item['image_path'])) {
+                unlink(ROOT_PATH . '/' . $item['image_path']);
             }
             $image_path = null;
         }
@@ -117,6 +125,9 @@ $title = $item['title'];
 $description = $item['description'];
 $status = $item['status'];
 $location = $item['location'];
+
+// Include header
+require_once ROOT_PATH . '/includes/templates/header.php';
 ?>
 
 <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -126,8 +137,8 @@ $location = $item['location'];
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
             <p><?php echo $success; ?></p>
             <p class="mt-2">
-                <a href="item_details.php?id=<?php echo $item['id']; ?>" class="text-green-700 font-bold underline">View item details</a> or 
-                <a href="dashboard.php" class="text-green-700 font-bold underline">go to your dashboard</a>
+                <a href="<?php echo url('pages/items/item_details.php?id=' . $item['id']); ?>" class="text-green-700 font-bold underline">View item details</a> or 
+                <a href="<?php echo url('pages/user/dashboard.php'); ?>" class="text-green-700 font-bold underline">go to your dashboard</a>
             </p>
         </div>
     <?php endif; ?>
@@ -138,7 +149,7 @@ $location = $item['location'];
         </div>
     <?php endif; ?>
     
-    <form action="edit_item.php?id=<?php echo $item['id']; ?>" method="post" enctype="multipart/form-data">
+    <form action="<?php echo url('pages/items/edit_item.php?id=' . $item['id']); ?>" method="post" enctype="multipart/form-data">
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
                 Status
@@ -154,7 +165,7 @@ $location = $item['location'];
                 Title *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                   id="title" type="text" name="title" value="<?php echo htmlspecialchars($title); ?>" required>
+                   id="title" type="text" name="title" value="<?php echo h($title); ?>" required>
         </div>
         
         <div class="mb-4">
@@ -162,7 +173,7 @@ $location = $item['location'];
                 Description *
             </label>
             <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                      id="description" name="description" rows="4" required><?php echo htmlspecialchars($description); ?></textarea>
+                      id="description" name="description" rows="4" required><?php echo h($description); ?></textarea>
         </div>
         
         <div class="mb-4">
@@ -170,16 +181,16 @@ $location = $item['location'];
                 Location *
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                   id="location" type="text" name="location" value="<?php echo htmlspecialchars($location); ?>" required>
+                   id="location" type="text" name="location" value="<?php echo h($location); ?>" required>
         </div>
         
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-bold mb-2">
                 Image
             </label>
-            <?php if (!empty($item['image_path']) && file_exists($item['image_path'])): ?>
+            <?php if (!empty($item['image_path']) && file_exists(ROOT_PATH . '/' . $item['image_path'])): ?>
                 <div class="mb-2">
-                    <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="Item Image" class="max-w-xs rounded">
+                    <img src="<?php echo url($item['image_path']); ?>" alt="Item Image" class="max-w-xs rounded">
                     <div class="mt-2">
                         <label class="inline-flex items-center">
                             <input type="checkbox" name="delete_image" value="1" class="form-checkbox">
@@ -191,6 +202,9 @@ $location = $item['location'];
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                    id="image" type="file" name="image" accept="image/*">
             <p class="text-sm text-gray-600 mt-1">Upload a new image or leave empty to keep the current one (Max size: 2MB)</p>
+            <div id="image-preview" class="mt-2 hidden">
+                <img src="" alt="Preview" class="max-w-xs rounded">
+            </div>
         </div>
         
         <div class="flex items-center justify-between">
@@ -198,7 +212,7 @@ $location = $item['location'];
                     type="submit">
                 Update Item
             </button>
-            <a href="dashboard.php" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+            <a href="<?php echo url('pages/user/dashboard.php'); ?>" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
                 Cancel
             </a>
         </div>
@@ -207,5 +221,5 @@ $location = $item['location'];
 
 <?php
 // Include footer
-require_once __DIR__ . '/../../includes/templates/footer.php';
+require_once ROOT_PATH . '/includes/templates/footer.php';
 ?>

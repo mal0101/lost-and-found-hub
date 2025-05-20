@@ -4,11 +4,10 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Helper function if not using the functions.php file
-if (!function_exists('url')) {
-    function url($path) {
-        return '/' . ltrim($path, '/');
-    }
+// If ROOT_PATH is not defined (direct access to this file)
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', dirname(dirname(__DIR__)));
+    require_once ROOT_PATH . '/includes/helpers/functions.php';
 }
 
 // Helper function for active navigation links
@@ -52,7 +51,7 @@ function isActive($path) {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                     </svg>
-                    <?php echo htmlspecialchars($_SESSION['username']); ?>
+                    <?php echo h($_SESSION['username']); ?>
                 </span>
                 <a href="<?php echo url('pages/auth/logout.php'); ?>" class="hover:underline text-yellow-200">
                     Logout

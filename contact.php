@@ -1,9 +1,14 @@
 <?php
+// Define root path constant
+define('ROOT_PATH', __DIR__);
+
 // Set page title
 $page_title = "Contact Us";
 
-// Include header
-require_once 'includes/templates/header.php';;
+// Include essential files
+require_once ROOT_PATH . '/config/db.php';
+require_once ROOT_PATH . '/includes/helpers/functions.php';
+require_once ROOT_PATH . '/includes/templates/header.php';
 
 $success = $error = "";
 
@@ -54,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
             <p><?php echo $success; ?></p>
             <p class="mt-2">
-                <a href="index.php" class="text-green-700 font-bold underline">Return to homepage</a>
+                <a href="<?php echo url('index.php'); ?>" class="text-green-700 font-bold underline">Return to homepage</a>
             </p>
         </div>
     <?php else: ?>
@@ -64,21 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
         
-        <form action="contact.php" method="post">
+        <form action="<?php echo url('contact.php'); ?>" method="post">
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
                     Your Name *
                 </label>
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                       id="name" type="text" name="name" value="<?php echo isset($name) ? htmlspecialchars($name) : ''; ?>" required>
+                       id="name" type="text" name="name" value="<?php echo isset($name) ? h($name) : ''; ?>" required>
             </div>
             
             <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
                     Your Email *
                 </label>
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                       id="email" type="email" name="email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required>
+                       id="email" type="email" name="email" value="<?php echo isset($email) ? h($email) : ''; ?>" required>
             </div>
             
             <div class="mb-4">
@@ -86,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Subject *
                 </label>
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                       id="subject" type="text" name="subject" value="<?php echo isset($subject) ? htmlspecialchars($subject) : ''; ?>" required>
+                       id="subject" type="text" name="subject" value="<?php echo isset($subject) ? h($subject) : ''; ?>" required>
             </div>
             
             <div class="mb-6">
@@ -94,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Message *
                 </label>
                 <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                          id="message" name="message" rows="5" required><?php echo isset($message) ? htmlspecialchars($message) : ''; ?></textarea>
+                          id="message" name="message" rows="5" required><?php echo isset($message) ? h($message) : ''; ?></textarea>
             </div>
             
             <div class="flex items-center justify-between">
@@ -109,5 +114,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Include footer
-require_once 'includes/templates/footer.php';
+require_once ROOT_PATH . '/includes/templates/footer.php';
 ?>

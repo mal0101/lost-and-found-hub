@@ -1,11 +1,21 @@
+.item-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
 
-.custom-container {
-    max-width: 1200px;
-    margin: 0 auto;
+.item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Form focus styles */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
 }
 
 /* Custom animation for alerts */
-.alert-animation {
+.alert-message {
     animation: fadeIn 0.5s;
 }
 
@@ -14,18 +24,129 @@
     to { opacity: 1; }
 }
 
-/* Custom styling for form elements */
-.form-input:focus {
-    border-color: #3182ce;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+/* Custom status badges */
+.status-lost {
+    background-color: #FED7D7;
+    color: #9B2C2C;
 }
 
-/* Custom card hover effect */
-.card-hover {
-    transition: transform 0.2s, box-shadow 0.2s;
+.status-found {
+    background-color: #C6F6D5;
+    color: #276749;
 }
 
-.card-hover:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+/* Responsive tweaks */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .item-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Image preview styles */
+#image-preview img {
+    max-height: 200px;
+    object-fit: contain;
+}
+
+/* Pagination styles */
+.pagination a, .pagination span {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.pagination a {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+}
+
+.pagination a:hover {
+    background-color: #f7fafc;
+}
+
+.pagination span {
+    background-color: #4299e1;
+    color: white;
+    border: 1px solid #3182ce;
+}
+
+/* Custom button styles */
+.btn {
+    display: inline-block;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background-color: #4299e1;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3182ce;
+}
+
+.btn-success {
+    background-color: #48bb78;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #38a169;
+}
+
+.btn-danger {
+    background-color: #f56565;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #e53e3e;
+}
+
+/* Form validation styles */
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #f56565;
+}
+
+.is-invalid {
+    border-color: #f56565;
+}
+
+.is-invalid:focus {
+    border-color: #f56565;
+    box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.5);
+}
+
+/* Flash message animation */
+.flash-message {
+    position: relative;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    animation: slideIn 0.5s, fadeOut 0.5s 4.5s;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }

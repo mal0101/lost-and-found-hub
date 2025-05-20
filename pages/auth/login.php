@@ -1,18 +1,21 @@
 <?php
+// Define root path
+define('ROOT_PATH', dirname(dirname(__DIR__)));
+
 // Set page title
 $page_title = "Login";
 
-// Start the session
+// Include essential files
+require_once ROOT_PATH . '/config/db.php';
+require_once ROOT_PATH . '/includes/helpers/functions.php';
+
+// Start session
 session_start();
 
 // If user is already logged in, redirect to index
 if (isset($_SESSION['user_id'])) {
-    header("Location: /index.php");
-    exit;
+    redirect('index.php');
 }
-
-// Include database connection
-require_once __DIR__ . '/../../config/db.php';
 
 $error = "";
 
@@ -31,16 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($user && password_verify($password, $user['password'])) {
-            // Password is correct, start a new session
-            session_start();
-            
-            // Store data in session variables
+            // Password is correct, store data in session variables
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             
+            // Set success message
+            set_flash_message('success', 'Welcome back, ' . $user['username'] . '!');
+            
             // Redirect to index page
-            header("Location: /index.php");
-            exit;
+            redirect('index.php');
         } else {
             $error = "Invalid email or password";
         }
@@ -48,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Include header
-require_once __DIR__ . '/../../includes/templates/header.php';
+require_once ROOT_PATH . '/includes/templates/header.php';
 ?>
 
 <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-8">
@@ -60,13 +62,13 @@ require_once __DIR__ . '/../../includes/templates/header.php';
         </div>
     <?php endif; ?>
     
-    <form action="login.php" method="post">
+    <form action="<?php echo url('pages/auth/login.php'); ?>" method="post">
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
                 Email
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                   id="email" type="email" name="email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required>
+                   id="email" type="email" name="email" value="<?php echo isset($email) ? h($email) : ''; ?>" required>
         </div>
         
         <div class="mb-6">
@@ -82,7 +84,7 @@ require_once __DIR__ . '/../../includes/templates/header.php';
                     type="submit">
                 Log In
             </button>
-            <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="register.php">
+            <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="<?php echo url('pages/auth/register.php'); ?>">
                 Create an account
             </a>
         </div>
@@ -91,5 +93,5 @@ require_once __DIR__ . '/../../includes/templates/header.php';
 
 <?php
 // Include footer
-require_once __DIR__ . '/../../includes/templates/footer.php';
+require_once ROOT_PATH . '/includes/templates/footer.php';
 ?>
