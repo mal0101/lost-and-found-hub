@@ -230,4 +230,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Styled with Tailwind CSS
 - Icons from Heroicons
 - Inspired by various lost and found systems worldwide
-- Made with ❤️ by [Your Name]
+<div align="center">Made with ❤️ by Malak M.</div>
+
+ 
