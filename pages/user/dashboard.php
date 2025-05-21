@@ -21,22 +21,22 @@ if (!isset($_SESSION['user_id'])) {
 // Handle delete request
 if (isset($_GET['delete'])) {
     $item_id = $_GET['delete'];
-    
+
     // Check if the item belongs to the current user
     $stmt = $pdo->prepare("SELECT * FROM items WHERE id = ? AND user_id = ?");
     $stmt->execute([$item_id, $_SESSION['user_id']]);
     $item = $stmt->fetch();
-    
+
     if ($item) {
         // Delete the item
         $delete_stmt = $pdo->prepare("DELETE FROM items WHERE id = ?");
         $delete_stmt->execute([$item_id]);
-        
+
         // Delete associated image if exists
         if (!empty($item['image_path']) && file_exists(ROOT_PATH . '/' . $item['image_path'])) {
             unlink(ROOT_PATH . '/' . $item['image_path']);
         }
-        
+
         set_flash_message('success', 'Item deleted successfully!');
         redirect('pages/user/dashboard.php');
     }
@@ -53,24 +53,23 @@ require_once ROOT_PATH . '/includes/templates/header.php';
 
 <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
     <h2 class="text-2xl font-bold mb-6">My Dashboard</h2>
-    
+
     <div class="mb-6">
         <h3 class="text-xl font-semibold mb-3">Quick Actions</h3>
         <div class="flex flex-wrap gap-3">
-            <a href="<?php echo url('pages/items/report_lost_item.php'); ?>" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Report Lost Item
+            <a href="<?php echo url('pages/items/report_item.php'); ?>"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Report Item
             </a>
-            <a href="<?php echo url('pages/items/report_found_item.php'); ?>" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Report Found Item
-            </a>
-            <a href="<?php echo url('pages/items/item_list.php'); ?>" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <a href="<?php echo url('pages/items/item_list.php'); ?>"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Browse All Items
             </a>
         </div>
     </div>
-    
+
     <h3 class="text-xl font-semibold mb-3">My Items</h3>
-    
+
     <?php if (count($items) > 0): ?>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white">
@@ -87,17 +86,20 @@ require_once ROOT_PATH . '/includes/templates/header.php';
                         <tr>
                             <td class="py-3 px-4 border-b"><?php echo h($item['title']); ?></td>
                             <td class="py-3 px-4 border-b">
-                                <span class="px-2 py-1 rounded <?php echo $item['status'] === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> text-sm font-semibold">
+                                <span
+                                    class="px-2 py-1 rounded <?php echo $item['status'] === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> text-sm font-semibold">
                                     <?php echo ucfirst($item['status']); ?>
                                 </span>
                             </td>
                             <td class="py-3 px-4 border-b"><?php echo date('M j, Y', strtotime($item['date_posted'])); ?></td>
                             <td class="py-3 px-4 border-b">
-                                <a href="<?php echo url('pages/items/item_details.php?id=' . $item['id']); ?>" class="text-blue-500 hover:underline mr-2">View</a>
-                                <a href="<?php echo url('pages/items/edit_item.php?id=' . $item['id']); ?>" class="text-green-500 hover:underline mr-2">Edit</a>
-                                <a href="<?php echo url('pages/user/dashboard.php?delete=' . $item['id']); ?>" 
-                                   onclick="return confirm('Are you sure you want to delete this item?')" 
-                                   class="text-red-500 hover:underline">Delete</a>
+                                <a href="<?php echo url('pages/items/item_details.php?id=' . $item['id']); ?>"
+                                    class="text-blue-500 hover:underline mr-2">View</a>
+                                <a href="<?php echo url('pages/items/edit_item.php?id=' . $item['id']); ?>"
+                                    class="text-green-500 hover:underline mr-2">Edit</a>
+                                <a href="<?php echo url('pages/user/dashboard.php?delete=' . $item['id']); ?>"
+                                    onclick="return confirm('Are you sure you want to delete this item?')"
+                                    class="text-red-500 hover:underline">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

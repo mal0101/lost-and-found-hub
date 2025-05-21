@@ -1,6 +1,8 @@
 <?php
 // Define root path constant
 define('ROOT_PATH', __DIR__);
+define('BASE_URL', '/project/lost-and-found-hub');
+
 
 // Set page title
 $page_title = "Home";

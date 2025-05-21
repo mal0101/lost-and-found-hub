@@ -2,7 +2,7 @@
 // Database configuration
 $host = 'localhost';
 $username = 'root';
-$password = 'root'; // MAMP default password
+$password = ''; // WAMP default password
 
 try {
     // Connect to MySQL without selecting a database

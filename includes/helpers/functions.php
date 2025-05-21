@@ -7,7 +7,7 @@
  * Generate a URL relative to the project root
  */
 function url($path) {
-    return '/' . ltrim($path, '/');
+    return "/project/lost-and-found-hub" . '/' . ltrim($path, '/');
 }
 
 /**
