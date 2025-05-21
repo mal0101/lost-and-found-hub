@@ -64,7 +64,7 @@ A modern web application that helps users report lost items and post found items
 
 1. **Clone the repository**
      ```bash
-     git clone https://github.com/yourusername/lost-and-found-hub.git
+     git clone https://github.com/mal0101/lost-and-found-hub.git
      cd lost-and-found-hub
      ```
 
